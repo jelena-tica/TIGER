@@ -20,7 +20,7 @@ echo "The script is in $BINDIR"
 
 # bundle dependencies
 SAMTOOLS="${BINDIR}/external/samtools-0.1.17/samtools"
-REFORMATBLAT="${BINDIR}/reformatingBlat.pl"
+REFORMATBLAT="${BINDIR}/external/reformatingBlat.pl"
 BAMGREPREADS="${BINDIR}/external/bamgrepreads/bamgrepreads"
 SP2TAB="${BINDIR}/external/sp2tab.py"
 TAB2SP="${BINDIR}/external/tab2sp.py"
