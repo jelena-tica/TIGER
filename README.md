@@ -52,10 +52,47 @@ http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/blat/blat)
 
 To install `bedtools` visit https://github.com/arq5x/bedtools2 and
 download current the version (recommended). On a command line type:
+	
 	tar -zxvf BEDTools-<version>.tar.gz
+	
 	cd BEDTools-<version>
+	
 	make
 
 
+Usage and test
+--------------
+When you call TIGER without arguments a usage synopsis will be shown:
+
+	TIGER_v1.sh bam aligner(bwa|eland) ref_genome L1_insertions translocations out_dir [min_match_len]
+
+This input is required: 
+
+* `bam`: Whole-Genome Sequencing BAM file
+* `aligner`: State which aligner has been used to map the BAM file from above (either eland or bwa)
+* `ref_genome`: FASTA file containing the reference genome (e.g. from UCSC)
+* `L1_insertions`: L1 insertion calls (from your favorite MEI caller) in the 
+  following TAB-separated format:
+
+		chromosome_of_insertion	breakpoint1	breakpoint2	TSD
+
+  where the `breakpoint1` and the `breakpoint2` are the start and end of a 
+  Target-Site Duplication (TSD) on a `chromosome_of_insertion`.
+* `translocations`: Translocation calls (from your favorite SV caller) in the 
+  following TAB-separated format:
+
+    	chromosome1	breakpoint1	chromosome2	breakpoint2
+
+  where the translocation happened between two locations in the genome. 
+  Both directions are taken into consideration (that the `chromosome1 breakpoint1` 
+  translocates to `chromosome2 breakpoint2` and vice versa).
+* `out_dir`: Folder to write results to
+* `min_match_len` (optional): Specify the minimum length of BLAT alignments 
+  to be considered. Defaults to 50. If you are using reads <=100bp, try lowering 
+  this value.
+
+The final transduction file will have the following format:
+ 
+ 	TargetChr       TargetStart     TargetEnd       SourceChr       SourceStart     SourceEnd       SumOfReads      AverageUniq     ReadsWith6A/Ts  TSD     SourceSize 
 
 
