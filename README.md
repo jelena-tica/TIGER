@@ -15,9 +15,9 @@ Installing TIGER
 Dependencies
 ------------
 
-	* Blat >= v34
-	* Bedtools (tested with version 2.17)
-	* Perl >= 5.8.x
+* Blat >= v34
+* Bedtools (tested with version 2.17)
+* Perl >= 5.8.x
 
 To install `blat`, visit the http://hgdownload.cse.ucsc.edu/admin/exe/, 
 enter the folder correspoding to your machine type and download the 
@@ -27,8 +27,10 @@ http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/blat/blat)
 
 To install `bedtools` visit https://github.com/arq5x/bedtools2 and
 download current the version (recommended). On a command line type:
-  tar -zxvf BEDTools-<version>.tar.gz
-  cd BEDTools-<version>
-  make
+   tar -zxvf BEDTools-<version>.tar.gz
+   cd BEDTools-<version>
+   make
+
+
 
 
