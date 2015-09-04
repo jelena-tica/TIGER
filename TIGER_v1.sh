@@ -2,7 +2,7 @@
 
 if [ $# -lt 6 ]
 then
-	echo -e "Usage:\n`basename $0` bam_file aligner(bwa|eland) ref_genome_file L1_insertion_file translocation_file out_dir [min_match_len]\n"
+	echo -e "Usage:\n`basename $0` bam aligner(bwa|eland) ref_genome L1_insertions translocations out_dir [min_match_len]\n"
 	exit 1
 fi
 
