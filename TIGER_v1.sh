@@ -92,7 +92,6 @@ else
 fi
 
 
-exit
 
 echo "--> Preparing files for TIGER ..."
 #1. take all L1 calls and reformat start-end (+/-500bp)
@@ -139,12 +138,8 @@ do
 
 	if [ "$ALIGNER" = "bwa" ]
 	then
-		exit 0
-		#${SAMTOOLS} view ${KEY}.firstExtractedRegions.bam | awk '{if ($7!="=") print $0}' > ${KEY}.firstbothMates.TLmate
-		#${SAMTOOLS} view ${KEY}.secondExtractedRegions.bam |  awk '{if ($7!="=") print $0}' >  ${KEY}.secondbothMates.TLmate
-		#${SAMTOOLS} view ${KEY}.firstExtractedRegions.bam |  awk 'and($2,8)==8'  > ${KEY}.firstbothMates.SAmate
-		#${SAMTOOLS} view ${KEY}.secondExtractedRegions.bam |  awk 'and($2,8)==8'  >  ${KEY}.secondbothMates.SAmate
-	
+		echo "bwa support is coming soon"
+		exit 2
 	elif [ "$ALIGNER" = "eland" ]
         then
         cat ${TMPDIR}/${SAMPLE}.${i}bothMates  \
@@ -185,8 +180,8 @@ fi
 
 echo ""
 
-#${BLAT} ${REFGENOME} ${TMPDIR}/${SAMPLE}.firstbothMates.TLSAmate.sorted.forBlat.seqs.fa  -ooc=${TMPDIR}/${REFNAME}.11.ooc ${TMPDIR}/${SAMPLE}.firstbothMates.TLSAmate.sorted.forBlat.seqs.fa.blat.out -out=blast8 
-#${BLAT} ${REFGENOME} ${TMPDIR}/${SAMPLE}.secondbothMates.TLSAmate.sorted.forBlat.seqs.fa  -ooc=${TMPDIR}/${REFNAME}.11.ooc ${TMPDIR}/${SAMPLE}.secondbothMates.TLSAmate.sorted.forBlat.seqs.fa.blat.out -out=blast8 
+${BLAT} ${REFGENOME} ${TMPDIR}/${SAMPLE}.firstbothMates.TLSAmate.sorted.forBlat.seqs.fa  -ooc=${TMPDIR}/${REFNAME}.11.ooc ${TMPDIR}/${SAMPLE}.firstbothMates.TLSAmate.sorted.forBlat.seqs.fa.blat.out -out=blast8 
+${BLAT} ${REFGENOME} ${TMPDIR}/${SAMPLE}.secondbothMates.TLSAmate.sorted.forBlat.seqs.fa  -ooc=${TMPDIR}/${REFNAME}.11.ooc ${TMPDIR}/${SAMPLE}.secondbothMates.TLSAmate.sorted.forBlat.seqs.fa.blat.out -out=blast8 
 
 echo "--> Processing BLAT output ..."
 
