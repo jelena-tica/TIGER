@@ -54,14 +54,22 @@ To install `bedtools` visit https://github.com/arq5x/bedtools2 and
 download current the version (recommended). On a command line type:
 	
 	tar -zxvf BEDTools-<version>.tar.gz
-	
 	cd BEDTools-<version>
-	
 	make
 
+Run a test case
+---------------
+The folder `test` contains a tiny data set from an Orangutan individual that
+you can use to test your installation. You still need the reference genome FASTA 
+file for Orangutan, which can be downloaded from the [UCSC Genome Browser](http://hgdownload.soe.ucsc.edu/goldenPath/ponAbe2/bigZips/).
 
-Usage and test
---------------
+Then call TIGER like this (and replace `<ponAbe2>` with the Orangutan genome):
+
+	./TIGER_v1.sh test/test.bam eland <ponAbe2.fa> test/test.l1 test/test.trans test/
+
+
+Usage
+-----
 When you call TIGER without arguments a usage synopsis will be shown:
 
 	TIGER_v1.sh bam aligner(bwa|eland) ref_genome L1_insertions translocations out_dir [min_match_len]
