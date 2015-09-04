@@ -1,5 +1,5 @@
 # TIGER
-TIGER stands for Transduction Inference in GERmline genomes, 
+TIGER stands for **T**ransduction **I**nference in **GER**mline genomes, 
 and it performs mobile element mediated transduction detection.
 
 The tool takes translocation prediction calls and mobile element 
@@ -13,9 +13,8 @@ TIGER consists of a single bash script that mostly uses standard Unix
 commands. However, it relies on certain external tools that have to be 
 pre-installed (see Dependencies) or are packaged into this repository
 for your convenience and to avoid problems with conflicting versions.
-Included are `bamgrepreads`, a tool from Pierre Lindenbaum 
-(http://code.google.com/p/variationtoolkit), and a version of `samtools`
-(http://sourceforge.net/projects/samtools/files/samtools/0.1.17/). 
+Included are `bamgrepreads`, a tool from [Pierre Lindenbaum](http://code.google.com/p/variationtoolkit),
+and a version of [samtools](http://sourceforge.net/projects/samtools/files/samtools/0.1.17/). 
 
 Obtain this repository to your computer by either cloning it
 
