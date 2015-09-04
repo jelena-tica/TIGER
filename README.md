@@ -18,16 +18,22 @@ Included are `bamgrepreads`, a tool from Pierre Lindenbaum
 (http://sourceforge.net/projects/samtools/files/samtools/0.1.17/). 
 
 Obtain this repository to your computer by either cloning it
+
 	git clone https://github.com/jelena-tica/TIGER.git
+
 or downloading it as a zip file. Uncompress the zip in the latter case.
 
 Enter the `external` directory
+
 	cd TIGER/external
+
 and simply type
+
 	make
 
 This will build samtools and bamgrepreads. Afterwards TIGER should be 
 ready to go. You best the script with its full pathname, e.g.
+
 	/path/to/installation/TIGER/TIGER_v1.sh
 
 
