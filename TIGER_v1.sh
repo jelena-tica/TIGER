@@ -293,7 +293,7 @@ echo "--> TIGER finished ..."
 
 printf "\nFrom $NUMOFL1 L1 elements in total and $NUMOFTRANS translocations in total, $NUMOFFINAL L1-mediated sequence transductions were detected.\n"
 
-
+#adding the hi-conf filtering
 while true
 do
 	echo -n "Do you want to continue with the high-confidence filtering? (yes/no) "
@@ -302,10 +302,11 @@ do
 	then
 		echo -n "Enter the path to the corresponding Repeat Masker file in bed format [ENTER]: "
 		read repmask
-		awk 'BEGIN {print "TargetChr\tTargetStart\tTargetEnd\tSourceChr\tSourceStart\tSourceEnd\tSumOfReads\tAverageUniq\tReadsWith6A/Ts\tTSD\tSourceSize"}' > ${OUTPUT}_norepmask
-		${BEDTOOLS} intersect -a ${TMPDIR}/${SAMPLE}.passed_filters -b ${repmask} -v >> ${OUTPUT}_norepmask
-		NUMOFRM=$(wc -l ${OUTPUT}_noRepMask | awk '{print $1}')
-		printf "\nDone filtering for repeats $NUMOFRM transductions remained.\n"
+		awk 'BEGIN {print "TargetChr\tTargetStart\tTargetEnd\tSourceChr\tSourceStart\tSourceEnd\tSumOfReads\tAverageUniq\tReadsWith6A/Ts\tTSD\tSourceSize"}' > ${OUTPUT}_noRepMask
+		${BEDTOOLS} intersect -a ${TMPDIR}/${SAMPLE}.passed_filters -b ${repmask} -v > ${TMPDIR}/${SAMPLE}.passed_filters_noRepMask.bed
+		cat ${TMPDIR}/${SAMPLE}.passed_filters_noRepMask.bed >> ${OUTPUT}_noRepMask
+		NUMOFRM=$(wc -l ${TMPDIR}/${SAMPLE}.passed_filters_noRepMask.bed | awk '{print $1}')
+		printf "\nDone filtering for repeats: $NUMOFRM transductions remained.\n"
 		while true
 		do
 			echo -n "Do you have segmental duplication file in bed format available? (yes/no) "
@@ -315,14 +316,17 @@ do
 				echo -n "Enter the path of the corresponding segmental duplication file in bed format [ENTER]: "
 				read segdups
 				awk 'BEGIN {print "TargetChr\tTargetStart\tTargetEnd\tSourceChr\tSourceStart\tSourceEnd\tSumOfReads\tAverageUniq\tReadsWith6A/Ts\tTSD\tSourceSize"}' > ${OUTPUT}_noRepMask_noSegDups
-				${BEDTOOLS} intersect -a ${TMPDIR}/${SAMPLE}.passed_filters_noRepMask -b ${segdups} -v >> ${OUTPUT}_noRepMask_noSegDups
-				NUMOFSG=$(wc -l ${OUTPUT}_noRepMask_noSegDups | awk '{print $1}')
-				printf "\nDone filtering for segmental duplications. $NUMOFSG transductions remained.\n"
+				${BEDTOOLS} intersect -a ${TMPDIR}/${SAMPLE}.passed_filters_noRepMask.bed -b ${segdups} -v > ${TMPDIR}/${SAMPLE}.passed_filters_noRepMask_noSegDups.bed
+				cat ${TMPDIR}/${SAMPLE}.passed_filters_noRepMask_noSegDups.bed >> ${OUTPUT}_noRepMask_noSegDups
+				NUMOFSG=$(wc -l ${TMPDIR}/${SAMPLE}.passed_filters_noRepMask_noSegDups.bed | awk '{print $1}')
+				printf "\nDone filtering for segmental duplications: $NUMOFSG transductions remained.\n"
+				echo "--> Finished with the high-confidence filtering ..."
 				exit 1	
 
 			elif [ "$seginput" == "no" ]
 			then
 				echo "No filtering based on presence of segmental duplications - quitting ..."
+				echo "--> Finished with the high-confidence filtering ..."
 				exit 1
 			fi
 		done	
@@ -333,6 +337,4 @@ do
 		echo "No filtering based on presence of reference repeats - quitting ..."
 		exit 1
 	fi
-echo "--> Finished with the high-confidence filtering ..."
 done
-
