@@ -188,8 +188,7 @@ else
    echo ""
 fi
 
-echo ""
-
+#running blat
 ${BLAT} ${REFGENOME} ${TMPDIR}/${SAMPLE}.firstbothMates.TLSAmate.sorted.forBlat.seqs.fa  -ooc=${TMPDIR}/${REFNAME}.11.ooc ${TMPDIR}/${SAMPLE}.firstbothMates.TLSAmate.sorted.forBlat.seqs.fa.blat.out -out=blast8 
 ${BLAT} ${REFGENOME} ${TMPDIR}/${SAMPLE}.secondbothMates.TLSAmate.sorted.forBlat.seqs.fa  -ooc=${TMPDIR}/${REFNAME}.11.ooc ${TMPDIR}/${SAMPLE}.secondbothMates.TLSAmate.sorted.forBlat.seqs.fa.blat.out -out=blast8 
 
