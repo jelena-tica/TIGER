@@ -185,6 +185,7 @@ then
    echo ""
 else
    ${BLAT} ${REFGENOME} /dev/null /dev/null -tileSize=11 -makeOoc=${TMPDIR}/${REFNAME}.11.ooc -repMatch=1024
+   echo ""
 fi
 
 echo ""
