@@ -138,8 +138,17 @@ do
 
 	if [ "$ALIGNER" = "bwa" ]
 	then
-		echo "bwa support is coming soon"
-		exit 2
+		cat ${TMPDIR}/${SAMPLE}.${i}bothMates  \
+		| awk '{if ($7!="=") {print $0}}' \
+		| sort -k7,8 \
+		> ${TMPDIR}/${SAMPLE}.${i}bothMates.TLmate 
+
+		${SAMTOOLS} view -f 0x0080 ${TMPDIR}/${SAMPLE}.${i}ExtractedRegions.bam \
+		| awk '{if ($4==$8) {print $0}}' \
+		| sort -k7,8 \
+		> ${TMPDIR}/${SAMPLE}.${i}bothMates.SAmate 
+
+		cat ${TMPDIR}/${SAMPLE}.${i}bothMates.TLmate ${TMPDIR}/${SAMPLE}.${i}bothMates.SAmate > ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate 
 	elif [ "$ALIGNER" = "eland" ]
         then
         cat ${TMPDIR}/${SAMPLE}.${i}bothMates  \
@@ -157,7 +166,7 @@ do
 	| awk '{print $1 "_" $2 "\t" $0}' \
 	| sort -k1,1 \
 	| join -v2 -1 1 -2 1 -  ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate.sorted \
-	| python $SP2TAB \
+	| python ${SP2TAB} \
 	| cut -f2- \
 	>  ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate.sorted.forBlat
 done
@@ -197,13 +206,13 @@ do
 	| awk '{print $1"\t"$2}' \
 	> ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate.sorted.forBlat.seqs.fa.blat.out.totalBlatHits
 
-	join -1 1 -2 2 ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate.sorted.forBlat.seqs.fa.blat.out.bestHit ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate.sorted.forBlat.seqs.fa.blat.out.totalBlatHits -t $'\t' \
+	join -1 1 -2 2 ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate.sorted.forBlat.seqs.fa.blat.out.bestHit ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate.sorted.forBlat.seqs.fa.blat.out.totalBlatHits \
 	| join -1 1 -2 1 ${TMPDIR}/${SAMPLE}.${i}keys - \
-	| python $SP2TAB \
+	| python ${SP2TAB} \
 	| cut -f2- \
 	> ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate.sorted.forBlat.seqs.fa.blat.out.combined
 
-	perl $REFORMATBLAT ${TMPDIR}/${SAMPLE}.${i}Coord.regions ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate.sorted.forBlat.seqs.fa.blat.out.combined ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate.sorted.forBlat.seqs.fa.blat.out.combinedWregions
+	perl ${REFORMATBLAT} ${TMPDIR}/${SAMPLE}.${i}Coord.regions ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate.sorted.forBlat.seqs.fa.blat.out.combined ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate.sorted.forBlat.seqs.fa.blat.out.combinedWregions
 done
 
 echo "--> Annotating reads and mates ..."
@@ -215,13 +224,13 @@ do
 	awk '{print $0"\t"$1"\t"$2+500"\t"$3-500}' ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate.sorted.forBlat.seqs.fa.blat.out.combinedWregions \
 	| sort -k 23,23 \
 	| join -1 23 -2 2 - ${TMPDIR}/${SAMPLE}.sorted \
-	| python $SP2TAB \
+	| python ${SP2TAB} \
 	> ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate.sorted.forBlat.seqs.fa.blat.out.combinedWregionsWtea
 
 	sort -k 1,1 ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate.sorted.forBlat > ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate.sorted.forBlat.sorted
 	sort -k 5,5 ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate.sorted.forBlat.seqs.fa.blat.out.combinedWregionsWtea \
 	| join -1 5 -2 1 - ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate.sorted.forBlat.sorted \
-	| python $SP2TAB \
+	| python ${SP2TAB} \
 	| sort -k 3,5 \
 	| awk 'BEGIN { OFS="\t" } {print $3,$4,$5,$1,$28,$29,$30,$31,$32,$33,$34,$35,$36,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$27,$23,$2,$24}' \
 	> ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate.sorted.forBlat.seqs.fa.blat.out.combinedWregionsWtea.reformatted
@@ -274,8 +283,56 @@ cat ${TMPDIR}/${SAMPLE}.passed_filters |awk 'BEGIN { OFS="\t" } {print $1,$2,$3,
 NUMOFL1=$(wc -l $4 | awk '{print $1}')
 NUMOFTRANS=$(wc -l $5 | awk '{print $1}')
 NUMOFFINAL=$(wc -l ${TMPDIR}/${SAMPLE}.passed_filters | awk '{print $1}')
-echo "--> Finished ..."
+
+NUMOFL1=$(wc -l $4 | awk '{print $1}')
+NUMOFTRANS=$(wc -l $5 | awk '{print $1}')
+NUMOFFINAL=$(wc -l ${TMPDIR}/${SAMPLE}.passed_filters | awk '{print $1}')
+
+
+echo "--> TIGER finished ..."
 
 printf "\nFrom $NUMOFL1 L1 elements in total and $NUMOFTRANS translocations in total, $NUMOFFINAL L1-mediated sequence transductions were detected.\n"
 
+
+while true
+do
+	echo -n "Do you want to continue with the high-confidence filtering? (yes/no) "
+	read input
+	if [ "$input" == "yes" ]
+	then
+		echo -n "Enter the path to the corresponding Repeat Masker file in bed format [ENTER]: "
+		read repmask
+		awk 'BEGIN {print "TargetChr\tTargetStart\tTargetEnd\tSourceChr\tSourceStart\tSourceEnd\tSumOfReads\tAverageUniq\tReadsWith6A/Ts\tTSD\tSourceSize"}' > ${OUTPUT}_norepmask
+		${BEDTOOLS} intersect -a ${TMPDIR}/${SAMPLE}.passed_filters -b ${repmask} -v >> ${OUTPUT}_norepmask
+		NUMOFRM=$(wc -l ${OUTPUT}_noRepMask | awk '{print $1}')
+		printf "\nDone filtering for repeats $NUMOFRM transductions remained.\n"
+		while true
+		do
+			echo -n "Do you have segmental duplication file in bed format available? (yes/no) "
+			read seginput
+			if [ "$seginput" == "yes" ]
+			then
+				echo -n "Enter the path of the corresponding segmental duplication file in bed format [ENTER]: "
+				read segdups
+				awk 'BEGIN {print "TargetChr\tTargetStart\tTargetEnd\tSourceChr\tSourceStart\tSourceEnd\tSumOfReads\tAverageUniq\tReadsWith6A/Ts\tTSD\tSourceSize"}' > ${OUTPUT}_noRepMask_noSegDups
+				${BEDTOOLS} intersect -a ${TMPDIR}/${SAMPLE}.passed_filters_noRepMask -b ${segdups} -v >> ${OUTPUT}_noRepMask_noSegDups
+				NUMOFSG=$(wc -l ${OUTPUT}_noRepMask_noSegDups | awk '{print $1}')
+				printf "\nDone filtering for segmental duplications. $NUMOFSG transductions remained.\n"
+				exit 1	
+
+			elif [ "$seginput" == "no" ]
+			then
+				echo "No filtering based on presence of segmental duplications - quitting ..."
+				exit 1
+			fi
+		done	
+
+
+	elif [ "$input" == "no" ]
+	then
+		echo "No filtering based on presence of reference repeats - quitting ..."
+		exit 1
+	fi
+echo "--> Finished with the high-confidence filtering ..."
+done
 
