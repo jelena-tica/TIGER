@@ -115,10 +115,14 @@ The final transduction file will have the following format:
 * `TSD`: Target Site Duplication (TSD) length
 * `SourceSize`: Computationally assessed size of the predicted transduction
 
+If you are running TIGER on multiple samples of the same species, it would be recommended to contruct the pool
+of all calls and search your L1/MEI input callset for all of them, which will increase the sensitivity and 
+improve the genotyping. 
+
 
 Filtering low-confidence regions
 --------------------------------
-To make sure that TIGER produced high-confidence results, we strongly advise to filter against presence of 
+To make sure that TIGER produced high-confidence results, it is strongly advised to filter against presence of 
 segmental duplications and known reference mobile elements. Since TIGER depends on MEI caller, raw non-reference
 MEI calls were filtered against known reference mobile elements based on indication coming from the MEI caller
 (in this case TEA specific `oi=1` calls were considered as high-confidence since they do not overlap known 
@@ -126,12 +130,13 @@ reference repeats). Moreover only L1 calls were considered as we were investigat
 transductions.
 
 If your favorite MEI caller does not provide such filter, Repeat Masker files can be used. You can download them from 
-the [UCSC Genome Browser](http://hgdownload.soe.ucsc.edu/downloads.html). You can type the following on the command line (shown here for the orangutan genome):
+the [UCSC Genome Browser](http://hgdownload.soe.ucsc.edu/downloads.html), by typing the following on the command line (shown here for the orangutan genome):
 	
 	wget http://hgdownload.soe.ucsc.edu/goldenPath/ponAbe2/bigZips/chromOut.tar.gz
 	tar -zxvf chromOut.tar.gz
 
-and remove the header from each file (if separated by chromosome) or from one file (if there is only one file). 
+Please make sure to remove the header from each file (if separated by chromosome) or from one file 
+(if there is only one file). 
 If you are only looking at specific repeats, e.g. L1, you can first extract only L1. Once you have one Repeat Masker 
 file containing all chromosomes without headers, you can contruct bed file by extracting `query chromosome`, 
 `position in query (begin)` and `position in query (end)` or columns 5, 6 and 7 separated by TAB. Therefore
