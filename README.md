@@ -1,10 +1,10 @@
 # TIGER
 TIGER stands for **T**ransduction **I**nference in **GER**mline genomes, 
-and it performs mobile element mediated transduction detection.
+and it performs non-reference mobile element mediated transduction detection.
 
-The tool takes translocation prediction calls and mobile element 
-insertion predictions and combines this information with the input 
-from either a BWA or ELAND mapped BAM files to generate high-
+The tool takes mobile element insertion predictions and translocation 
+prediction calls and  combines this information with the input 
+from either a BWA or ELAND mapped BAMs files to generate a high-
 confidence transduction callset.
 
 Installing TIGER
@@ -31,7 +31,7 @@ and simply type
 	make
 
 This will build samtools and bamgrepreads. Afterwards TIGER should be 
-ready to go. You best the script with its full pathname, e.g.
+ready to run. You best execute the script with its full pathname, e.g.
 
 	/path/to/installation/TIGER/TIGER_v1.sh
 
@@ -44,14 +44,14 @@ You need the following external tools installed and in your `PATH`:
 * Bedtools (tested with version 2.17)
 * Perl >= 5.8.x
 
-To install `blat`, visit the http://hgdownload.cse.ucsc.edu/admin/exe/, 
-enter the folder correspoding to your machine type and download the 
+To install `blat`, visit http://hgdownload.cse.ucsc.edu/admin/exe/, 
+enter the folder corresponding to your machine type and download the 
 blat pre-compiled binary (e.g. for Linux x86_64 machine, the following 
 executable will be installed:
 http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/blat/blat)
 
 To install `bedtools` visit https://github.com/arq5x/bedtools2 and
-download current the version (recommended). On a command line type:
+download the current version (recommended). On a command line type:
 	
 	tar -zxvf BEDTools-<version>.tar.gz
 	cd BEDTools-<version>
@@ -59,9 +59,12 @@ download current the version (recommended). On a command line type:
 
 Run a test case
 ---------------
-The folder `test` contains a tiny data set from an Orangutan individual that
-you can use to test your installation. You still need the reference genome FASTA 
-file for Orangutan, which can be downloaded from the [UCSC Genome Browser](http://hgdownload.soe.ucsc.edu/goldenPath/ponAbe2/bigZips/).
+The folder `test` contains data from a small subset from an orangutan individual 
+sequenced to 25x sequencing coverage in 2x100bp mode (Gokcumen et al., PNAS, 2013) that
+you can use to test your installation. This data is aligned with Eland, the 
+non-reference mobile element calls come from a modified version of TEA (Lee et al., Science, 2012)
+and the translocation calls from Delly v0.0.11 - jumpy_v0.0.11 (Rausch et al., Bioinformatics, 2012).
+You still need the reference genome FASTA file for orangutan, which can be downloaded from the [UCSC Genome Browser](http://hgdownload.soe.ucsc.edu/goldenPath/ponAbe2/bigZips/).
 
 Then call TIGER like this (and replace `<ponAbe2>` with the Orangutan genome):
 
@@ -102,5 +105,14 @@ This input is required:
 The final transduction file will have the following format:
  
  	TargetChr       TargetStart     TargetEnd       SourceChr       SourceStart     SourceEnd       SumOfReads      AverageUniq     ReadsWith6A/Ts  TSD     SourceSize 
+
+* `TargetChr, TargetStart, TargetEnd`: Target chromosome, target start, target end (locus of insertion)
+* `SourceChr, SourceStart, SourceEnd`: Source chromosome, source start, source end (locus of origin)
+* `SumOfReads`: Sum of reads indicating the translocation which confirms transduction
+* `AverageUniq`: The average "uniqueness" of reads indicating transduction (mean of how many times the read is found in the genome)
+* `ReadsWith6A/Ts`:  Number of reads containing at least six consecutive non-reference As/Ts
+* `TSD`: Target Site Duplication (TSD) length
+* `SourceSize`: Computationally assessed size of the predicted transduction
+
 
 
