@@ -143,7 +143,7 @@ Be careful to remove the header from the TIGER output file because bedtools will
 
 The same procedure can be done for segmental duplications if such files are available. The recommended TIGER run will
 filter the output against both known repeats (either by using the filter from your favorite MEI caller or by
-intersecting the calls against RepeatMasker given that your caller does not support such filter) and segmental duplications resulting in the high-confidence transduction calls.
+intersecting the calls against RepeatMasker given that your caller does not support such filter) and segmental duplications resulting in the list containing high-confidence transduction calls.
 
 The results of such filtering and the TIGER output can be found in `test/expected_output`. 
 
