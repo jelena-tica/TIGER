@@ -60,10 +60,10 @@ download the current version (recommended). On a command line type:
 Run a test case
 ---------------
 The folder `test` contains data from a small subset from an orangutan individual 
-sequenced to 25x sequencing coverage in 2x100bp mode (Gokcumen et al., PNAS, 2013) that
+sequenced to 25x sequencing coverage in 2x100bp mode `(Gokcumen et al., PNAS, 2013)` that
 you can use to test your installation. This data is aligned with Eland, the 
-non-reference mobile element calls come from a modified version of TEA (Lee et al., Science, 2012)
-and the translocation calls from Delly v0.0.11 - jumpy_v0.0.11 (Rausch et al., Bioinformatics, 2012).
+non-reference mobile element calls come from a modified version of `TEA (Lee et al., Science, 2012)`
+and the translocation calls from `Delly v0.0.11 - jumpy_v0.0.11 (Rausch et al., Bioinformatics, 2012)`.
 You still need the reference genome FASTA file for orangutan, which can be downloaded from the [UCSC Genome Browser](http://hgdownload.soe.ucsc.edu/goldenPath/ponAbe2/bigZips/).
 
 Then call TIGER like this (and replace `<ponAbe2>` with the Orangutan genome):
