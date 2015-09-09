@@ -132,7 +132,7 @@ orangutan. You can then type the following on the command line:
 and remove the header from each file (if separated by chromosome) or from one file (if there is only one file). 
 If you are only looking at specific repeats, e.g. L1, you can first extract only L1. Once you have one Repeat Masker 
 file containing all chromosomes without headers, you can contruct bed file by extracting `query chromosome`, 
-position in query (begin)` and `position in query (end)` or columns 5, 6 and 7 separated by TAB. Therefore
+`position in query (begin)` and `position in query (end)` or columns 5, 6 and 7 separated by TAB. Therefore
 you will now have a bed file and you can simply execute the following:
 	
 	bedtools intersect -a <previous_TIGER_output.bed> -b <RepMask_file.bed> -v > TIGER_output_noRepMask.bed
