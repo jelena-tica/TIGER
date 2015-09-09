@@ -70,6 +70,7 @@ Then call TIGER like this (and replace `<ponAbe2>` with the Orangutan genome):
 
 	./TIGER_v1.sh test/test.bam eland <ponAbe2.fa> test/test.l1 test/test.trans test/
 
+The results of such TIGER run can be found in `test/expected_output`. 
 
 Usage
 -----
@@ -120,13 +121,14 @@ Filtering low-confidence regions
 To make sure that TIGER produced high-confidence results, we strongly advise to filter against presence of 
 segmental duplications and known reference mobile elements. Since TIGER depends on MEI caller, raw non-reference
 MEI calls were filtered against known reference mobile elements based on indication coming from the MEI caller
-(in this case TEA specific `oi=1` calls were considered as high-confidence). Moreover only L1 calls were considered
-as we were investigating L1-mediated sequence transductions.
+(in this case TEA specific `oi=1` calls were considered as high-confidence since they do not overlap known 
+reference repeats). Moreover only L1 calls were considered as we were investigating L1-mediated sequence 
+transductions.
 
 If your favorite MEI caller does not provide such filter, Repeat Masker files can be used. You can download them from 
-the [UCSC Genome Browser](http://hgdownload.soe.ucsc.edu/goldenPath/ponAbe2/bigZips/) such as shown here for 
-orangutan. You can then type the following on the command line:
+the [UCSC Genome Browser](http://hgdownload.soe.ucsc.edu/downloads.html). You can type the following on the command line (shown here for the orangutan genome):
 	
+	wget http://hgdownload.soe.ucsc.edu/goldenPath/ponAbe2/bigZips/chromOut.tar.gz
 	tar -zxvf chromOut.tar.gz
 
 and remove the header from each file (if separated by chromosome) or from one file (if there is only one file). 
@@ -141,7 +143,7 @@ Be careful to remove the header from the TIGER output file because bedtools will
 
 The same procedure can be done for segmental duplications if such files are available. The recommended TIGER run will
 filter the output against both known repeats (either by using the filter from your favorite MEI caller or by
-intersecting the calls against RepeatMasker if your caller does not support such filter) and segmental duplications.
+intersecting the calls against RepeatMasker given that your caller does not support such filter) and segmental duplications resulting in the high-confidence transduction calls.
 
 The results of such filtering and the TIGER output can be found in `test/expected_output`. 
 
