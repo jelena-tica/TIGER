@@ -62,7 +62,7 @@ Run a test case
 The folder `test` contains data from a small subset from an orangutan individual 
 sequenced to 25x sequencing coverage in 2x100bp mode `(Gokcumen et al., PNAS, 2013)` that
 you can use to test your installation. This data is aligned with Eland, the 
-non-reference mobile element calls come from a modified version of `TEA (Lee et al., Science, 2012)`
+non-reference mobile element calls come from a modified version of `Transposable Element Analyzer - TEA (Lee et al., Science, 2012)`
 and the translocation calls from `Delly v0.0.11 - jumpy_v0.0.11 (Rausch et al., Bioinformatics, 2012)`.
 You still need the reference genome FASTA file for orangutan, which can be downloaded from the [UCSC Genome Browser](http://hgdownload.soe.ucsc.edu/goldenPath/ponAbe2/bigZips/). It is recommended to run it on 20-30x sequencing coverage data, as it is currently extensively tested  and used only on such data.
 
@@ -116,8 +116,8 @@ The final transduction file will have the following format:
 * `SourceSize`: Computationally assessed size of the predicted transduction
 
 If you are running TIGER on multiple samples of the same species, it would be recommended to contruct the pool
-of all calls and search your L1/MEI input callset for all of them, which will increase the sensitivity and 
-improve the genotyping. 
+of all transduction calls (from each individual) and search your L1/MEI individual input callset for all of them, 
+which will increase the sensitivity and improve the genotyping. 
 
 
 Filtering low-confidence regions
