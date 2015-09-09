@@ -148,27 +148,44 @@ do
 		| sort -k7,8 \
 		> ${TMPDIR}/${SAMPLE}.${i}bothMates.SAmate 
 
-		cat ${TMPDIR}/${SAMPLE}.${i}bothMates.TLmate ${TMPDIR}/${SAMPLE}.${i}bothMates.SAmate > ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate 
+		awk '{print $1 "_" $2 "\t" $0}' ${TMPDIR}/${SAMPLE}.${i}bothMates.TLmate | sort -k 1,1 > ${TMPDIR}/${SAMPLE}.${i}bothMates.TLmate.sorted
+
 	elif [ "$ALIGNER" = "eland" ]
-        then
+    then
         cat ${TMPDIR}/${SAMPLE}.${i}bothMates  \
 		| awk '{if (($7!="=")&&($7!="*")) print $0}' \
 		| sort -k7,8 \
 		> ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate 
+		awk '{print $1 "_" $2 "\t" $0}' ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate  | sort -k 1,1 > ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate.sorted
+
 	fi
-	awk '{print $1 "_" $2 "\t" $0}' ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate  | sort -k 1,1 > ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate.sorted
 done
 
 echo "--> Preparing for realignment step with BLAT ..."
 for i in first second
 do
-	${SAMTOOLS} view  ${TMPDIR}/${SAMPLE}.${i}ExtractedRegions.bam \
-	| awk '{print $1 "_" $2 "\t" $0}' \
-	| sort -k1,1 \
-	| join -v2 -1 1 -2 1 -  ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate.sorted \
-	| python ${SP2TAB} \
-	| cut -f2- \
-	>  ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate.sorted.forBlat
+	if [ "$ALIGNER" = "bwa" ]
+	then
+		${SAMTOOLS} view  ${TMPDIR}/${SAMPLE}.${i}ExtractedRegions.bam \
+		| awk '{print $1 "_" $2 "\t" $0}' \
+		| sort -k1,1 \
+		| join -v2 -1 1 -2 1 -  ${TMPDIR}/${SAMPLE}.${i}bothMates.TLmate.sorted \
+		| python ${SP2TAB} \
+		| cut -f2- \
+		>  ${TMPDIR}/${SAMPLE}.${i}bothMates.TLmate.sorted.forBlat
+
+		cat ${TMPDIR}/${SAMPLE}.${i}bothMates.SAmate >> ${TMPDIR}/${SAMPLE}.${i}bothMates.TLmate.sorted.forBlat
+
+	elif [ "$ALIGNER" = "eland" ]
+	then
+		${SAMTOOLS} view  ${TMPDIR}/${SAMPLE}.${i}ExtractedRegions.bam \
+		| awk '{print $1 "_" $2 "\t" $0}' \
+		| sort -k1,1 \
+		| join -v2 -1 1 -2 1 -  ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate.sorted \
+		| python ${SP2TAB} \
+		| cut -f2- \
+		>  ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate.sorted.forBlat
+	fi
 done
 
 
@@ -291,50 +308,9 @@ NUMOFFINAL=$(wc -l ${TMPDIR}/${SAMPLE}.passed_filters | awk '{print $1}')
 
 echo "--> TIGER finished ..."
 
-printf "\nFrom $NUMOFL1 L1 elements in total and $NUMOFTRANS translocations in total, $NUMOFFINAL L1-mediated sequence transductions were detected.\n"
 
-#adding the hi-conf filtering
-while true
-do
-	echo -n "Do you want to continue with the high-confidence filtering? (yes/no) "
-	read input
-	if [ "$input" == "yes" ]
-	then
-		echo -n "Enter the path to the corresponding Repeat Masker file in bed format [ENTER]: "
-		read repmask
-		awk 'BEGIN {print "TargetChr\tTargetStart\tTargetEnd\tSourceChr\tSourceStart\tSourceEnd\tSumOfReads\tAverageUniq\tReadsWith6A/Ts\tTSD\tSourceSize"}' > ${OUTPUT}_noRepMask
-		${BEDTOOLS} intersect -a ${TMPDIR}/${SAMPLE}.passed_filters -b ${repmask} -v > ${TMPDIR}/${SAMPLE}.passed_filters_noRepMask.bed
-		cat ${TMPDIR}/${SAMPLE}.passed_filters_noRepMask.bed >> ${OUTPUT}_noRepMask
-		NUMOFRM=$(wc -l ${TMPDIR}/${SAMPLE}.passed_filters_noRepMask.bed | awk '{print $1}')
-		printf "\nDone filtering for repeats: $NUMOFRM transductions remained.\n"
-		while true
-		do
-			echo -n "Do you have segmental duplication file in bed format available? (yes/no) "
-			read seginput
-			if [ "$seginput" == "yes" ]
-			then
-				echo -n "Enter the path of the corresponding segmental duplication file in bed format [ENTER]: "
-				read segdups
-				awk 'BEGIN {print "TargetChr\tTargetStart\tTargetEnd\tSourceChr\tSourceStart\tSourceEnd\tSumOfReads\tAverageUniq\tReadsWith6A/Ts\tTSD\tSourceSize"}' > ${OUTPUT}_noRepMask_noSegDups
-				${BEDTOOLS} intersect -a ${TMPDIR}/${SAMPLE}.passed_filters_noRepMask.bed -b ${segdups} -v > ${TMPDIR}/${SAMPLE}.passed_filters_noRepMask_noSegDups.bed
-				cat ${TMPDIR}/${SAMPLE}.passed_filters_noRepMask_noSegDups.bed >> ${OUTPUT}_noRepMask_noSegDups
-				NUMOFSG=$(wc -l ${TMPDIR}/${SAMPLE}.passed_filters_noRepMask_noSegDups.bed | awk '{print $1}')
-				printf "\nDone filtering for segmental duplications: $NUMOFSG transductions remained.\n"
-				echo "--> Finished with the high-confidence filtering ..."
-				exit 1	
-
-			elif [ "$seginput" == "no" ]
-			then
-				echo "No filtering based on presence of segmental duplications - quitting ..."
-				echo "--> Finished with the high-confidence filtering ..."
-				exit 1
-			fi
-		done	
+printf "\nFrom $NUMOFL1 L1 elements in total and $NUMOFTRANS translocations in total, $NUMOFFINAL L1-mediated sequence transductions were detected.\nThe results can be found at $OUTPUT.\n"
 
 
-	elif [ "$input" == "no" ]
-	then
-		echo "No filtering based on presence of reference repeats - quitting ..."
-		exit 1
-	fi
-done
+
+
