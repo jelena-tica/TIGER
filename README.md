@@ -64,7 +64,7 @@ sequenced to 25x sequencing coverage in 2x100bp mode `(Gokcumen et al., PNAS, 20
 you can use to test your installation. This data is aligned with Eland, the 
 non-reference mobile element calls come from a modified version of `TEA (Lee et al., Science, 2012)`
 and the translocation calls from `Delly v0.0.11 - jumpy_v0.0.11 (Rausch et al., Bioinformatics, 2012)`.
-You still need the reference genome FASTA file for orangutan, which can be downloaded from the [UCSC Genome Browser](http://hgdownload.soe.ucsc.edu/goldenPath/ponAbe2/bigZips/).
+You still need the reference genome FASTA file for orangutan, which can be downloaded from the [UCSC Genome Browser](http://hgdownload.soe.ucsc.edu/goldenPath/ponAbe2/bigZips/). It is recommended to run it on 20-30x sequencing coverage data, as it is currently extensively tested  and used only on such data.
 
 Then call TIGER like this (and replace `<ponAbe2>` with the Orangutan genome):
 
@@ -113,6 +113,40 @@ The final transduction file will have the following format:
 * `ReadsWith6A/Ts`:  Number of reads containing at least six consecutive non-reference As/Ts
 * `TSD`: Target Site Duplication (TSD) length
 * `SourceSize`: Computationally assessed size of the predicted transduction
+
+
+Filtering low-confidence regions
+--------------------------------
+To make sure that TIGER produced high-confidence results, we strongly advise to filter against presence of 
+segmental duplications and known reference mobile elements. Since TIGER depends on MEI caller, raw non-reference
+MEI calls were filtered against known reference mobile elements based on indication coming from the MEI caller
+(in this case TEA specific `oi=1` calls were considered as high-confidence). Moreover only L1 calls were considered
+as we were investigating L1-mediated sequence transductions.
+
+If your favorite MEI caller does not provide such filter, Repeat Masker files can be used. You can download them from 
+the [UCSC Genome Browser](http://hgdownload.soe.ucsc.edu/goldenPath/ponAbe2/bigZips/) such as shown here for 
+orangutan. You can then type the following on the command line:
+	
+	tar -zxvf chromOut.tar.gz
+
+and remove the header from each file (if separated by chromosome) or from one file (if there is only one file). 
+If you are only looking at specific repeats, e.g. L1, you can first extract only L1. Once you have one Repeat Masker 
+file containing all chromosomes without headers, you can contruct bed file by extracting `query chromosome`, 
+position in query (begin)` and `position in query (end)` or columns 5, 6 and 7 separated by TAB. Therefore
+you will now have a bed file and you can simply execute the following:
+	
+	bedtools intersect -a <previous_TIGER_output.bed> -b <RepMask_file.bed> -v > TIGER_output_noRepMask.bed
+
+Be careful to remove the header from the TIGER output file because bedtools will not run.
+
+The same procedure can be done for segmental duplications if such files are available. The recommended TIGER run will
+filter the output against both known repeats (either by using the filter from your favorite MEI caller or by
+intersecting the calls against RepeatMasker if your caller does not support such filter) and segmental duplications.
+
+The results of such filtering and the TIGER output can be found in `test/expected_output`. 
+
+
+
 
 
 
