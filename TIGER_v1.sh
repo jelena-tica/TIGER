@@ -92,7 +92,6 @@ else
 fi
 
 
-
 echo "--> Preparing files for TIGER ..."
 #1. take all L1 calls and reformat start-end (+/-500bp)
 
@@ -172,9 +171,9 @@ do
 		| join -v2 -1 1 -2 1 -  ${TMPDIR}/${SAMPLE}.${i}bothMates.TLmate.sorted \
 		| python ${SP2TAB} \
 		| cut -f2- \
-		>  ${TMPDIR}/${SAMPLE}.${i}bothMates.TLmate.sorted.forBlat
+		>  ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate.sorted.forBlat
 
-		cat ${TMPDIR}/${SAMPLE}.${i}bothMates.SAmate >> ${TMPDIR}/${SAMPLE}.${i}bothMates.TLmate.sorted.forBlat
+		cat ${TMPDIR}/${SAMPLE}.${i}bothMates.SAmate >> ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate.sorted.forBlat
 
 	elif [ "$ALIGNER" = "eland" ]
 	then
@@ -192,7 +191,7 @@ done
 for i in first second
 do
 	cat ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate.sorted.forBlat | cut -f 1,2,3,4,7,8,10 | awk '{print ">"$1"_"$2"_"$3"_"$4"_"$5"_"$6"\n"$7}' > ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate.sorted.forBlat.seqs.fa 
-	cat ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate.sorted.forBlat | cut -f 1,2,3,4,7,8,10 | awk '{print $1"_"$2"_"$3"_"$4"_"$5"_"$6"\t"$1"\t"$2"t\t"$3"\t"$4"\t"$5"\t"$6}' > ${TMPDIR}/${SAMPLE}.${i}keys
+	cat ${TMPDIR}/${SAMPLE}.${i}bothMates.TLSAmate.sorted.forBlat | cut -f 1,2,3,4,7,8,10 | awk '{print $1"_"$2"_"$3"_"$4"_"$5"_"$6"\t"$1"\t"$2"\t"$3"\t"$4"\t"$5"\t"$6}' > ${TMPDIR}/${SAMPLE}.${i}keys
 done
 
 echo "--> Realigning mates of paired-reads with BLAT ..."
@@ -277,7 +276,7 @@ cat ${TMPDIR}/${SAMPLE}.firstbothMates.TLSAmate.sorted.forBlat.seqs.fa.blat.out.
 echo "--> Preparing the final output ..."
 
 
-cat ${TMPDIR}/${SAMPLE}.merged | awk 'BEGIN { OFS="\t" }{$1="";print $2"_"$3"_"$4,$0}' \
+cat ${TMPDIR}/${SAMPLE}.merged | awk 'BEGIN { OFS="\t" }{$1="";print $2"___"$3"___"$4,$0}' \
 	| awk 'BEGIN { OFS="\t" } {if ($23>$22) {print $0} else {t=$23; $23=$22; $22=t; print $0}} '\
 	| sort -k1,1 -k15,15 -k22,23n \
 	| awk 'BEGIN{ OFS="\t"; id=""}\
@@ -286,9 +285,10 @@ cat ${TMPDIR}/${SAMPLE}.merged | awk 'BEGIN { OFS="\t" }{$1="";print $2"_"$3"_"$
 		   	else \
 		   		{ if (sum>=4) {print id,blatChr,min,max,sum,numMatchSum/sum,polyATcount,$27 } id=$1; sum=1; min=$22; max=$23; blatChr=$15; numMatchSum=$26; if ($31$32~/AAAAAA|TTTTTT/) polyATcount=1; \
 		   		else polyATcount=0 } } \
-		   END{ if (sum>=4) { print id,blatChr,min,max,sum,numMatchSum/sum,polyATcount,$27 } }' \
-	| awk 'BEGIN { OFS="\t" } {if (($6<=3)&&($5<30)) print $0}'\
-	| sed 's/_/	/g'\
+		   END{ if (sum>=1) { print id,blatChr,min,max,sum,numMatchSum/sum,polyATcount,$27 } }' \
+	| tee ${TMPDIR}/${SAMPLE}.merged.intermediate1 \
+	| awk 'BEGIN { OFS="\t" } {if (($6<=3)&&($5<30)&&($5>=4)) print $0}'\
+	| sed 's/___/	/g'\
 	| awk 'BEGIN { OFS="\t" } {if ($1!=$4) print $0}' \
 	| awk '{print $1"\t"$2+500"\t"$3-500"\t"$0}' \
 	| sort -n \
